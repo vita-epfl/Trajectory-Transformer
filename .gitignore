@@ -2,5 +2,7 @@
 output/
 models/
 logs/
+datasets/
+*_rotTrue/
 env
 __pycache__

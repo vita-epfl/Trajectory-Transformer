@@ -47,6 +47,7 @@ def main():
     parser.add_argument('--scale', type=bool, default="True")
     parser.add_argument('--rot', type=bool, default="False")
     parser.add_argument('--axes_lim', type=int, default=2)
+    parser.add_argument('--sample',type=float,default=1.0)
 
 
 
@@ -79,8 +80,8 @@ def main():
     # test_dataset,_ =  baselineUtils.create_dataset(args.dataset_folder,args.dataset_name,0,args.obs,args.preds,delim=args.delim,train=False,eval=True,verbose=args.verbose)
     args.dataset_name = 'datasets/' + args.dataset_name
     ## Prepare data
-    train_dataset, _, _ = prepare_data(args.dataset_name, subset='/train/', sample=0.1)
-    test_dataset, _, _ = prepare_data(args.dataset_name, subset='/test/', sample=0.1)
+    train_dataset, _, _ = prepare_data(args.dataset_name, subset='/train/', sample=args.sample)
+    test_dataset, _, _ = prepare_data(args.dataset_name, subset='/test/', sample=args.sample)
 
     # tr = train_dataset[:]['src'][:, 1:, 2:4].reshape(-1, 2)
     # pr = train_dataset[:]['trg'][:, :, 2:4].reshape(-1, 2)

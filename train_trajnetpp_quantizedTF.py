@@ -46,7 +46,7 @@ def main():
     parser.add_argument('--name', type=str, default="zara1")
     parser.add_argument('--factor', type=float, default=1.)
     parser.add_argument('--evaluate',type=bool,default=True)
-    parser.add_argument('--save_step', type=int, default=1)
+    parser.add_argument('--save_step', type=int, default=5)
 
 
 
@@ -107,7 +107,7 @@ def main():
     ## Prepare data
     train_dataset, _, _ = prepare_data('datasets/' + args.dataset_name, subset='/train/', sample=1.0)
     val_dataset, _, _ = prepare_data('datasets/' + args.dataset_name, subset='/val/', sample=1.0)
-    test_dataset, _, _ = prepare_data('datasets/' + args.dataset_name, subset='/val/', sample=1.0)
+    test_dataset, _, _ = prepare_data('datasets/' + args.dataset_name, subset='/test_private/', sample=1.0)
     ############################################################################################################
 
     mat = scipy.io.loadmat(os.path.join(args.dataset_folder, args.dataset_name, "clusters.mat"))
@@ -206,7 +206,7 @@ def main():
                 batch['src'].append(attr_scene[:args.obs])
                 batch['trg'].append(attr_scene[-args.preds:])
 
-                if len(batch['src']) % args.batch_size != 0:
+                if (len(batch['src']) % args.batch_size != 0) and (id_b + 1 != len(test_dataset)):
                     continue
                 
                 batch['src'] = torch.Tensor(np.stack(batch['src']))
@@ -259,7 +259,7 @@ def main():
     ## TrajNet++ Edit ################################################################################################
                 batch = {'src': [], 'trg': []}
                 # for id_b,batch in enumerate(test_dl):
-                for _, (filename, scene_id, paths) in enumerate(test_dataset):
+                for id_b, (filename, scene_id, paths) in enumerate(test_dataset):
                     ## make new scene
                     pos_scene = trajnetplusplustools.Reader.paths_to_xy(paths)[:, 0]  # primary ped
                     vel_scene = np.zeros_like(pos_scene)
@@ -268,7 +268,7 @@ def main():
                     batch['src'].append(attr_scene[:args.obs])
                     batch['trg'].append(attr_scene[-args.preds:])
 
-                    if len(batch['src']) % args.batch_size != 0:
+                    if (len(batch['src']) % args.batch_size != 0) and (id_b + 1 != len(test_dataset)):
                         continue
                     
                     batch['src'] = torch.Tensor(np.stack(batch['src']))
@@ -324,7 +324,7 @@ def main():
 
                 # MULTI MODALITY
                 if True:
-                    num_samples=20
+                    num_samples=3
 
                     model.eval()
                     gt=[]
@@ -334,7 +334,7 @@ def main():
                         pr_all[sam]=[]
         ## TrajNet++ Edit ################################################################################################
                     # for id_b,batch in enumerate(test_dl):
-                    for _, (filename, scene_id, paths) in enumerate(test_dataset):
+                    for id_b, (filename, scene_id, paths) in enumerate(test_dataset):
                         ## make new scene
                         pos_scene = trajnetplusplustools.Reader.paths_to_xy(paths)[:, 0]  # primary ped
                         vel_scene = np.zeros_like(pos_scene)
@@ -343,7 +343,7 @@ def main():
                         batch['src'].append(attr_scene[:args.obs])
                         batch['trg'].append(attr_scene[-args.preds:])
 
-                        if len(batch['src']) % args.batch_size != 0:
+                        if (len(batch['src']) % args.batch_size != 0) and (id_b + 1 != len(test_dataset)):
                             continue
                         
                         batch['src'] = torch.Tensor(np.stack(batch['src']))

@@ -175,7 +175,7 @@ def main():
             batch['src'].append(attr_scene[:args.obs])
             batch['trg'].append(attr_scene[-args.preds:])
 
-            if len(batch['src']) % args.batch_size != 0:
+            if (len(batch['src']) % args.batch_size != 0) and (id_b + 1 != len(test_dataset)):
                 continue
             
             batch['src'] = torch.Tensor(np.stack(batch['src']))
@@ -238,7 +238,7 @@ def main():
                 batch['src'].append(attr_scene[:args.obs])
                 batch['trg'].append(attr_scene[-args.preds:])
 
-                if len(batch['src']) % args.batch_size != 0:
+                if (len(batch['src']) % args.batch_size != 0) and (id_b + 1 != len(test_dataset)):
                     continue
                 
                 batch['src'] = torch.Tensor(np.stack(batch['src']))
@@ -307,7 +307,7 @@ def main():
                     batch['src'].append(attr_scene[:args.obs])
                     batch['trg'].append(attr_scene[-args.preds:])
 
-                    if len(batch['src']) % args.batch_size != 0:
+                    if (len(batch['src']) % args.batch_size != 0) and (id_b + 1 != len(test_dataset)):
                         continue
                     
                     batch['src'] = torch.Tensor(np.stack(batch['src']))
