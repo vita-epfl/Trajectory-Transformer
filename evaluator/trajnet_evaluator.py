@@ -335,7 +335,7 @@ def eval(gt, input_file, args):
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--path', default='trajdata',
+    parser.add_argument('--path', default='colfree_trajdata',
                         help='directory of data to test')
     parser.add_argument('--obs_length', default=9, type=int,
                         help='observation length')
@@ -352,9 +352,9 @@ def main():
     
     # Transformer
     parser.add_argument('--dataset_folder',type=str,default='datasets')
-    parser.add_argument('--dataset_name',type=str,default='synth_456_huge')
-    parser.add_argument('--name', type=str, default="synth_456_huge")
-    parser.add_argument('--epoch',type=str,default="00001")
+    parser.add_argument('--dataset_name',type=str,default='colfree_trajdata')
+    parser.add_argument('--name', type=str, default="colfree_trajdata")
+    parser.add_argument('--epoch',type=str,default="00095")
     parser.add_argument('--emb_size',type=int,default=512)
     parser.add_argument('--heads',type=int, default=8)
     parser.add_argument('--layers',type=int,default=6)

@@ -27,7 +27,7 @@ def main():
     parser=argparse.ArgumentParser(description='Train the individual Transformer model')
     parser.add_argument('--dataset_folder',type=str,default='datasets')
     parser.add_argument('--dataset_name',type=str,default='zara1')
-    parser.add_argument('--obs',type=int,default=9)
+    parser.add_argument('--obs',type=int,default=8)
     parser.add_argument('--preds',type=int,default=12)
     parser.add_argument('--emb_size',type=int,default=512)
     parser.add_argument('--heads',type=int, default=8)
@@ -398,7 +398,7 @@ def main():
                     log.add_scalar('eval/MM_mad', mad_samp, epoch)
                     log.add_scalar('eval/MM_fad', fad_samp, epoch)
 
-            if epoch % args.save_step == 0:
+            if epoch % args.save_step == 0 and epoch > 80:
                 torch.save(model.state_dict(), f'models/QuantizedTF/{args.name}/{epoch:05d}.pth')
 
 

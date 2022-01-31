@@ -29,7 +29,7 @@ def main():
     parser=argparse.ArgumentParser(description='Train the individual Transformer model')
     parser.add_argument('--dataset_folder',type=str,default='datasets')
     parser.add_argument('--dataset_name',type=str,default='zara1')
-    parser.add_argument('--obs',type=int,default=9)
+    parser.add_argument('--obs',type=int,default=8)
     parser.add_argument('--preds',type=int,default=12)
     parser.add_argument('--emb_size',type=int,default=512)
     parser.add_argument('--heads',type=int, default=8)
@@ -40,7 +40,7 @@ def main():
     parser.add_argument('--delim',type=str,default='\t')
     parser.add_argument('--name', type=str, default="zara1")
     parser.add_argument('--epoch',type=str,default="00001")
-    parser.add_argument('--num_samples', type=int, default="20")
+    parser.add_argument('--num_samples', type=int, default="3")
 
 
 
