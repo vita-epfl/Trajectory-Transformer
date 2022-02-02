@@ -16,6 +16,14 @@ import scipy.io
 import quantized_TF
 from transformer.batch import subsequent_mask
 
+
+def pre_process_test(sc_, obs_len=8):
+    obs_frames = [primary_row.frame for primary_row in sc_[0]][:obs_len]
+    last_frame = obs_frames[-1]
+    sc_ = [[row for row in ped if row.frame in obs_frames] for ped in sc_ if ped[0].frame <= last_frame]
+    return sc_
+
+
 def process_scene(model, clusters, paths, args):
     ## For each scene, get predictions
     ## Taken snippet from test_trajnetpp_quantizedTF.py
@@ -135,7 +143,7 @@ def main(args=None):
         # Read Scenes from 'test' folder
         reader = trajnetplusplustools.Reader(args.path.replace('_pred', '') + dataset + '.ndjson', scene_type='paths')
         ## Necessary modification of train scene to add filename (for goals)
-        scenes = [(dataset, s_id, s) for s_id, s in reader.scenes()]
+        scenes = [(dataset, s_id, pre_process_test(s, args.obs_length)) for s_id, s in reader.scenes()]
 
         # Get the model prediction and write them in corresponding test_pred file
         # VERY IMPORTANT: Prediction Format

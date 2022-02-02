@@ -96,6 +96,7 @@ class TrajnetEvaluator:
             ## Extract Prediction Frames
             primary_tracks_all = [t for t in self.scenes_sub[i][0] if t.scene_id == self.scenes_id_gt[i]]
             neighbours_tracks_all = [[t for t in self.scenes_sub[i][j] if t.scene_id == self.scenes_id_gt[i]] for j in range(1, len(self.scenes_sub[i]))]
+            neighbours_tracks_all = [t for t in neighbours_tracks_all if len(t)]
 
 ##### --------------------------------------------------- SINGLE -------------------------------------------- ####
 

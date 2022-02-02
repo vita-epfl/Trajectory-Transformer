@@ -4,6 +4,13 @@ import torch
 import trajnetplusplustools
 
 
+def pre_process_test(sc_, obs_len=8):
+    obs_frames = [primary_row.frame for primary_row in sc_[0]][:obs_len]
+    last_frame = obs_frames[-1]
+    sc_ = [[row for row in ped] for ped in sc_ if ped[0].frame <= last_frame]
+    return sc_
+
+
 def trajnet_loader(data_loader, args):
     batch = {'src': [], 'trg': []}
     num_batches = 0
@@ -33,6 +40,7 @@ def trajnet_test_loader(data_loader, args):
     num_batches = 0
     for batch_idx, (filename, scene_id, paths) in enumerate(data_loader):
         ## make new scene
+        paths = pre_process_test(paths)
         pos_scene = trajnetplusplustools.Reader.paths_to_xy(paths)
         vel_scene = np.zeros_like(pos_scene)
         vel_scene[1:] = pos_scene[1:] - pos_scene[:-1]
