@@ -11,6 +11,8 @@ TrajNet++ sampling allows to focus on pedestrians of interest that undergo socia
   - Scipy
   - Pandas
   - Tensorboard
+  - trajnetplusplustools
 
 ## Scripts
 Refer to Makefile for generating clusters, training and evaluation scripts.
+We directly provide the generated clusters in 'datasets' folder.

@@ -20,8 +20,8 @@ import quantized_TF
 ## TrajNet++
 import trajnetplusplustools
 from data_load_utils import prepare_data
-from trajnetpp_eval_utils import trajnet_sample_eval, trajnet_sample_multi_eval
-
+from trajnetpp_eval_utils import trajnet_batch_eval, trajnet_batch_multi_eval
+from trajnet_loader import trajnet_test_loader
 
 
 
@@ -40,7 +40,7 @@ def main():
     parser.add_argument('--delim',type=str,default='\t')
     parser.add_argument('--name', type=str, default="zara1")
     parser.add_argument('--epoch',type=str,default="00001")
-    parser.add_argument('--num_samples', type=int, default="3")
+    parser.add_argument('--num_samples', type=int, default="20")
 
 
 
@@ -75,10 +75,7 @@ def main():
     except:
         pass
 
-    #log=SummaryWriter('logs/%s'%model_name)
 
-    # log.add_scalar('eval/mad', 0, 0)
-    # log.add_scalar('eval/fad', 0, 0)
     device=torch.device("cuda")
 
     if args.cpu or not torch.cuda.is_available():
@@ -87,9 +84,6 @@ def main():
     args.verbose=True
 
 
-    ## creation of the dataloaders for train and validation
-
-    # test_dataset,_ =  baselineUtils.create_dataset(args.dataset_folder,args.dataset_name,0,args.obs,args.preds,delim=args.delim,train=False,eval=True,verbose=args.verbose)
     test_dataset, _, _ = prepare_data('datasets/' + args.dataset_name, subset='/test_private/', sample=1.0)
 
     mat = scipy.io.loadmat(os.path.join(args.dataset_folder, args.dataset_name, "clusters.mat"))
@@ -101,15 +95,6 @@ def main():
 
     model.load_state_dict(torch.load(f'models/QuantizedTF/{args.name}/{args.epoch}.pth'))
     model.to(device)
-
-
-    # test_dl = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=0)
-
-    #optim = SGD(list(a.parameters())+list(model.parameters())+list(generator.parameters()),lr=0.01)
-    #sched=torch.optim.lr_scheduler.StepLR(optim,0.0005)
-
-
-
 
     # DETERMINISTIC MODE
     with torch.no_grad():
@@ -125,20 +110,7 @@ def main():
 
         # TrajNet Eval
         ade, fde, pred_col, gt_col = 0, 0, 0, 0 
-        # for id_b,batch in enumerate(test_dl):
-        for id_b, (filename, scene_id, paths) in enumerate(test_dataset):
-            ## make new scene
-            pos_scene = trajnetplusplustools.Reader.paths_to_xy(paths)  # ALL ped
-            vel_scene = np.zeros_like(pos_scene)
-            vel_scene[1:] = pos_scene[1:] - pos_scene[:-1]
-            attr_scene = np.concatenate((pos_scene, vel_scene), axis=2)
-            batch['src'] = torch.Tensor(attr_scene[:args.obs]).permute(1, 0, 2)
-            batch['trg'] = torch.Tensor(attr_scene[-args.preds:]).permute(1, 0, 2)
-############################################################################################################
-            # print(f"batch {id_b:03d}/{len(test_dataset)}")
-            # peds.append(batch['peds'])
-            # frames.append(batch['frames'])
-            # dt.append(batch['dataset'])
+        for id_b,(batch, batch_split) in enumerate(trajnet_test_loader(test_dataset, args)):   # TrajNet_loader
             scale = np.random.uniform(0.5, 2)
             # rot_mat = np.array([[np.cos(r), np.sin(r)], [-np.sin(r), np.cos(r)]])
             n_in_batch = batch['src'].shape[0]
@@ -159,7 +131,7 @@ def main():
 
 
             preds_tr_b=clusters[dec_inp[:,1:].cpu().numpy()].cumsum(1)+batch['src'][:,-1:,0:2].cpu().numpy()
-            ade_b, fde_b, pred_col_b, gt_col_b = trajnet_sample_eval(preds_tr_b, gt_b.cpu().numpy())
+            ade_b, fde_b, pred_col_b, gt_col_b = trajnet_batch_eval(preds_tr_b, gt_b.cpu().numpy(), batch_split.cpu().numpy())
             ade += ade_b
             fde += fde_b
             pred_col += pred_col_b
@@ -189,20 +161,7 @@ def main():
         topk_fde = 0.0
         for sam in range(num_samples):
             pr_all[sam]=[]
-        # for id_b,batch in enumerate(test_dl):
-        for id_b, (filename, scene_id, paths) in enumerate(test_dataset):
-            ## make new scene
-            pos_scene = trajnetplusplustools.Reader.paths_to_xy(paths)  # ALL ped
-            vel_scene = np.zeros_like(pos_scene)
-            vel_scene[1:] = pos_scene[1:] - pos_scene[:-1]
-            attr_scene = np.concatenate((pos_scene, vel_scene), axis=2)
-            batch['src'] = torch.Tensor(attr_scene[:args.obs]).permute(1, 0, 2)
-            batch['trg'] = torch.Tensor(attr_scene[-args.preds:]).permute(1, 0, 2)
-############################################################################################################
-            # print(f"batch {id_b:03d}/{len(test_dl)}")
-            # peds.append(batch['peds'])
-            # frames.append(batch['frames'])
-            # dt.append(batch['dataset'])
+        for id_b,(batch, batch_split) in enumerate(trajnet_test_loader(test_dataset, args)):   # TrajNet_loader
             scale = np.random.uniform(0.5, 2)
             # rot_mat = np.array([[np.cos(r), np.sin(r)], [-np.sin(r), np.cos(r)]])
             n_in_batch = batch['src'].shape[0]
@@ -234,33 +193,9 @@ def main():
                 pr_all[sam].append(preds_tr_b)
                 multi_preds_b.append(preds_tr_b)
             
-            topk_ade_b, topk_fde_b = trajnet_sample_multi_eval(multi_preds_b, gt_b.cpu().numpy())
+            topk_ade_b, topk_fde_b = trajnet_batch_multi_eval(multi_preds_b, gt_b.cpu().numpy(), batch_split.cpu().numpy())
             topk_ade += topk_ade_b
             topk_fde += topk_fde_b
-
-        # peds=np.concatenate(peds,0)
-        # frames=np.concatenate(frames,0)
-        # dt=np.concatenate(dt,0)
-        # gt=np.concatenate(gt,0)
-        # dt_names=test_dataset.data['dataset_name']
-        #pr=np.concatenate(pr,0)
-        # inp=np.concatenate(inp_,0)
-        # samp = {}
-        # for k in pr_all.keys():
-        #     samp[k] = {}
-        #     samp[k]['pr'] = np.concatenate(pr_all[k], 0)
-        #     samp[k]['mad'], samp[k]['fad'], samp[k]['err'] = baselineUtils.distance_metrics(gt, samp[k]['pr'])
-
-        # ev = [samp[i]['err'] for i in range(num_samples)]
-        # e20 = np.stack(ev, -1)
-        # mad_samp=e20.mean(1).min(-1).mean()
-        # fad_samp=e20[:,-1].min(-1).mean()
-        #mad,fad,errs=baselineUtils.distance_metrics(gt,pr)
-
-        #log.add_scalar('eval/MM_mad', mad_samp, epoch)
-        #log.add_scalar('eval/MM_fad', fad_samp, epoch)
-        # preds_all_fin=np.stack(list([samp[i]['pr'] for i in range(num_samples)]),-1)
-        # scipy.io.savemat(f"output/QuantizedTF/{args.name}/MM_{num_samples}.mat",{'input':inp,'gt':gt,'pr':preds_all_fin,'peds':peds,'frames':frames,'dt':dt,'dt_names':dt_names})
 
         print("Multimodality:")
         print("MM ADE: %6.3f" % (topk_ade / len(test_dataset)))

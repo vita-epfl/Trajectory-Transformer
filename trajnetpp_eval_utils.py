@@ -60,5 +60,30 @@ def topk_fde(preds, gt):
 def trajnet_sample_eval(pred, gt):
     return ade(pred, gt), fde(pred, gt), pred_col(pred, gt), gt_col(pred, gt)
 
+def trajnet_batch_eval(pred, gt, seq_start_end):    
+    s_ade = 0
+    s_fde = 0
+    s_pred_col = 0
+    s_gt_col = 0
+
+    for (start, end) in seq_start_end:
+        s_ade += ade(pred[start:end], gt[start:end])
+        s_fde += fde(pred[start:end], gt[start:end])
+        s_pred_col += pred_col(pred[start:end], gt[start:end])
+        s_gt_col += gt_col(pred[start:end], gt[start:end])
+
+    return s_ade, s_fde, s_pred_col, s_gt_col
+
 def trajnet_sample_multi_eval(preds, gt):
     return topk_ade(preds, gt), topk_fde(preds, gt)
+
+def trajnet_batch_multi_eval(preds, gt, seq_start_end):
+    s_topk_ade = 0
+    s_topk_fde = 0
+
+    for (start, end) in seq_start_end:
+        s_preds = [pred[start:end] for pred in preds]
+        s_topk_ade += topk_ade(s_preds, gt[start:end])
+        s_topk_fde += topk_fde(s_preds, gt[start:end])
+
+    return s_topk_ade, s_topk_fde

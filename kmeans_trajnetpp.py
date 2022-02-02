@@ -73,19 +73,11 @@ def main():
 
     ## TrajNet++ ################################################################################################
     ## creation of the dataloaders for train and validation
-    # train_dataset,_ = baselineUtils.create_dataset(args.dataset_folder,args.dataset_name,0,args.obs,args.preds,delim=args.delim,train=True,verbose=args.verbose)
-    # val_dataset, _ = baselineUtils.create_train_dataset(args.dataset_folder, args.dataset_name, 0, args.obs,
-    #                                                                 args.preds, delim=args.delim, train=False,
-    #                                                                 verbose=args.verbose)
-    # test_dataset,_ =  baselineUtils.create_dataset(args.dataset_folder,args.dataset_name,0,args.obs,args.preds,delim=args.delim,train=False,eval=True,verbose=args.verbose)
     args.dataset_name = 'datasets/' + args.dataset_name
     ## Prepare data
     train_dataset, _, _ = prepare_data(args.dataset_name, subset='/train/', sample=args.sample)
-    test_dataset, _, _ = prepare_data(args.dataset_name, subset='/test/', sample=args.sample)
+    test_dataset, _, _ = prepare_data(args.dataset_name, subset='/test_private/', sample=args.sample)
 
-    # tr = train_dataset[:]['src'][:, 1:, 2:4].reshape(-1, 2)
-    # pr = train_dataset[:]['trg'][:, :, 2:4].reshape(-1, 2)
-    # t = torch.cat((tr, pr), 0)
 
     t = []
     for scene_i, (filename, scene_id, paths) in enumerate(train_dataset):
@@ -108,9 +100,6 @@ def main():
     test = torch.cat(test)
     ############################################################################################################
 
-    # tr = train_dataset[:]['src'][:, 1:, 2:4].reshape(-1, 2)
-    # pr = train_dataset[:]['trg'][:, :, 2:4].reshape(-1, 2)
-    # t = torch.cat((tr, pr), 0)
     t= t.cpu().numpy()
     if args.scale:
         s=[1,0.7,0.5,1.5,2]
@@ -125,13 +114,6 @@ def main():
     plt.savefig(f'{outdir}/train_distribution.png')
     plt.close()
 
-
-    # te = test_dataset[:]['src'][:, 1:, 2:4].reshape(-1, 2)
-    # test=te
-
-    # if args.dataset_name!="trajnet":
-    #     pe = test_dataset[:]['trg'][:, :, 2:4].reshape(-1, 2)
-    #     test= torch.cat((te, pe), 0)
     test = test.cpu().numpy()
 
 
