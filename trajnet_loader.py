@@ -40,7 +40,7 @@ def trajnet_test_loader(data_loader, args):
     num_batches = 0
     for batch_idx, (filename, scene_id, paths) in enumerate(data_loader):
         ## make new scene
-        paths = pre_process_test(paths)
+        paths = pre_process_test(paths, args.obs)
         pos_scene = trajnetplusplustools.Reader.paths_to_xy(paths)
         vel_scene = np.zeros_like(pos_scene)
         vel_scene[1:] = pos_scene[1:] - pos_scene[:-1]

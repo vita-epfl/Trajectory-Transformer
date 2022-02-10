@@ -20,7 +20,7 @@ import quantized_TF
 ## TrajNet++
 import trajnetplusplustools
 from data_load_utils import prepare_data
-from trajnetpp_eval_utils import trajnet_batch_eval, trajnet_batch_multi_eval
+from evaluator.eval_utils import trajnet_batch_eval, trajnet_batch_multi_eval
 from trajnet_loader import trajnet_test_loader
 
 

@@ -41,3 +41,6 @@
 	CUDA_VISIBLE_DEVICES=1 python test_trajnetpp_quantizedTF.py --dataset_name eth_data --name eth_data --batch_size 1024 --epoch 00095
 	CUDA_VISIBLE_DEVICES=1 python test_trajnetpp_quantizedTF.py --dataset_name univ_data --name univ_data --batch_size 1024 --epoch 00095
 	CUDA_VISIBLE_DEVICES=1 python test_trajnetpp_quantizedTF.py --dataset_name zara2_data --name zara2_data --batch_size 1024 --epoch 00095
+
+@ test_trajnet:  # For submission to AICrowd
+	python -m trajnet_evaluator --write_only
