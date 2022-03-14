@@ -21,26 +21,34 @@
 
 @ train_individual:
 	CUDA_VISIBLE_DEVICES=1 python train_trajnetpp_individualTF.py --dataset_name eth_data --name eth_data --batch_size 1024
+	CUDA_VISIBLE_DEVICES=1 python train_trajnetpp_individualTF.py --dataset_name hotel_data --name hotel_data --batch_size 1024
 	CUDA_VISIBLE_DEVICES=1 python train_trajnetpp_individualTF.py --dataset_name univ_data --name univ_data --batch_size 1024
+	CUDA_VISIBLE_DEVICES=1 python train_trajnetpp_individualTF.py --dataset_name zara1_data --name zara1_data --batch_size 1024
 	CUDA_VISIBLE_DEVICES=1 python train_trajnetpp_individualTF.py --dataset_name zara2_data --name zara2_data --batch_size 1024
 	
-	# Create own validation set for TrajNet++
+	# Note: Create own validation set for TrajNet++
 	# CUDA_VISIBLE_DEVICES=1 python train_trajnetpp_individualTF.py --dataset_name colfree_trajdata --name colfree_trajdata --batch_size 1024 --obs 9
 
 
 @ train:
-	CUDA_VISIBLE_DEVICES=1 python train_trajnetpp_quantizedTF.py --dataset_name eth_data --name eth_data --batch_size 1024
-	CUDA_VISIBLE_DEVICES=1 python train_trajnetpp_quantizedTF.py --dataset_name univ_data --name univ_data --batch_size 1024
-	CUDA_VISIBLE_DEVICES=1 python train_trajnetpp_quantizedTF.py --dataset_name zara2_data --name zara2_data --batch_size 1024
+	# CUDA_VISIBLE_DEVICES=1 python train_trajnetpp_quantizedTF.py --dataset_name eth_data --name eth_data --batch_size 1024
+	# CUDA_VISIBLE_DEVICES=1 python train_trajnetpp_quantizedTF.py --dataset_name hotel_data --name hotel_data --batch_size 1024
+	# CUDA_VISIBLE_DEVICES=1 python train_trajnetpp_quantizedTF.py --dataset_name univ_data --name univ_data --batch_size 1024
+	# CUDA_VISIBLE_DEVICES=1 python train_trajnetpp_quantizedTF.py --dataset_name zara1_data --name zara1_data --batch_size 1024
+	# CUDA_VISIBLE_DEVICES=1 python train_trajnetpp_quantizedTF.py --dataset_name zara2_data --name zara2_data --batch_size 1024
 	
 	# Create own validation set for TrajNet++
 	# CUDA_VISIBLE_DEVICES=1 python train_trajnetpp_quantizedTF.py --dataset_name colfree_trajdata --name colfree_trajdata --batch_size 1024 --obs 9
-
+	
 
 @ test:
-	CUDA_VISIBLE_DEVICES=1 python test_trajnetpp_quantizedTF.py --dataset_name eth_data --name eth_data --batch_size 1024 --epoch 00095
-	CUDA_VISIBLE_DEVICES=1 python test_trajnetpp_quantizedTF.py --dataset_name univ_data --name univ_data --batch_size 1024 --epoch 00095
-	CUDA_VISIBLE_DEVICES=1 python test_trajnetpp_quantizedTF.py --dataset_name zara2_data --name zara2_data --batch_size 1024 --epoch 00095
+	# CUDA_VISIBLE_DEVICES=1 python test_trajnetpp_quantizedTF.py --dataset_name eth_data --name eth_data --batch_size 1024 --epoch 00095
+	# CUDA_VISIBLE_DEVICES=1 python test_trajnetpp_quantizedTF.py --dataset_name hotel_data --name hotel_data --batch_size 1024 --epoch 00095
+	# CUDA_VISIBLE_DEVICES=1 python test_trajnetpp_quantizedTF.py --dataset_name univ_data --name univ_data --batch_size 1024 --epoch 00095
+	# CUDA_VISIBLE_DEVICES=1 python test_trajnetpp_quantizedTF.py --dataset_name zara1_data --name zara1_data --batch_size 1024 --epoch 00095
+	# CUDA_VISIBLE_DEVICES=1 python test_trajnetpp_quantizedTF.py --dataset_name zara2_data --name zara2_data --batch_size 1024 --epoch 00095
+
+	# CUDA_VISIBLE_DEVICES=1 python test_trajnetpp_quantizedTF.py --dataset_name colfree_trajdata --name colfree_trajdata --batch_size 1 --epoch 00095 --obs 9
 
 @ test_trajnet:  # For submission to AICrowd
 	python -m trajnet_evaluator --write_only

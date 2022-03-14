@@ -40,7 +40,7 @@ def main():
     parser.add_argument('--delim',type=str,default='\t')
     parser.add_argument('--name', type=str, default="zara1")
     parser.add_argument('--epoch',type=str,default="00001")
-    parser.add_argument('--num_samples', type=int, default="20")
+    parser.add_argument('--num_samples', type=int, default="3")
 
 
 
