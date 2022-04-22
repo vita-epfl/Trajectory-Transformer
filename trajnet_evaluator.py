@@ -19,8 +19,8 @@ from transformer.batch import subsequent_mask
 
 
 def predict_scene(model, clusters, paths, args):
-    ## For each scene, get predictions
-    ## Taken snippet from test_trajnetpp_quantizedTF.py
+    # For each scene, get predictions
+    # Taken snippet from test_trajnetpp_quantizedTF.py
     batch = {'src': []}
     device = 'cuda:0'
     paths = preprocess_test(paths, args.obs_length)
@@ -34,9 +34,9 @@ def predict_scene(model, clusters, paths, args):
     n_in_batch = batch['src'].shape[0]
     speeds_inp = batch['src'][:, 1:, 2:4]
     inp = torch.tensor(
-        scipy.spatial.distance.cdist(speeds_inp.reshape(-1, 2), clusters).argmin(axis=1).reshape(n_in_batch,
-                                                                                                    -1)).to(
-        device)
+        scipy.spatial.distance.cdist(speeds_inp.reshape(-1, 2), clusters)\
+            .argmin(axis=1).reshape(n_in_batch, -1)
+        ).to(device)
     src_att = torch.ones((inp.shape[0], 1,inp.shape[1])).to(device)
     start_of_seq = torch.tensor([clusters.shape[0]]).repeat(n_in_batch).unsqueeze(1).to(device)
     dec_inp = start_of_seq
@@ -54,8 +54,8 @@ def predict_scene(model, clusters, paths, args):
 
 
 def predict_multimodal_scene(model, clusters, paths, args):
-    ## For each scene, get predictions
-    ## Taken snippet from test_trajnetpp_quantizedTF.py
+    # For each scene, get predictions
+    # Taken snippet from test_trajnetpp_quantizedTF.py
     batch = {'src': []}
     device = 'cuda:0'
     paths = preprocess_test(paths, args.obs_length)
@@ -69,9 +69,9 @@ def predict_multimodal_scene(model, clusters, paths, args):
     n_in_batch = batch['src'].shape[0]
     speeds_inp = batch['src'][:, 1:, 2:4]
     inp = torch.tensor(
-        scipy.spatial.distance.cdist(speeds_inp.reshape(-1, 2), clusters).argmin(axis=1).reshape(n_in_batch,
-                                                                                                    -1)).to(
-        device)
+        scipy.spatial.distance.cdist(speeds_inp.reshape(-1, 2), clusters)\
+            .argmin(axis=1).reshape(n_in_batch,-1)
+        ).to(device)
     src_att = torch.ones((inp.shape[0], 1,inp.shape[1])).to(device)
     start_of_seq = torch.tensor([clusters.shape[0]]).repeat(n_in_batch).unsqueeze(1).to(device)
 
@@ -85,8 +85,8 @@ def predict_multimodal_scene(model, clusters, paths, args):
             h=out[:,-1]
             dec_inp=torch.cat((dec_inp,torch.multinomial(h,1)),1)
 
-
-        preds_tr_b=clusters[dec_inp[:,1:].cpu().numpy()].cumsum(1)+batch['src'][:,-1:,0:2].cpu().numpy()
+        preds_tr_b = clusters[dec_inp[:, 1:].cpu().numpy()].cumsum(1) + \
+            batch['src'][:, -1:, 0:2].cpu().numpy()
         if sam == 0:
             multimodal_outputs[0] = [preds_tr_b[0], preds_tr_b[1:].transpose(1, 0, 2)]
         else:
@@ -98,8 +98,10 @@ def load_predictor(args):
     mat = scipy.io.loadmat(os.path.join(args.dataset_folder, args.dataset_name, "clusters.mat"))
     clusters=mat['centroids']
     device = 'cuda:0'
-    model=quantized_TF.QuantizedTF(clusters.shape[0], clusters.shape[0]+1, clusters.shape[0], N=args.layers,
-                                   d_model=args.emb_size, d_ff=1024, h=args.heads).to(device)
+    model = quantized_TF.QuantizedTF(
+        clusters.shape[0], clusters.shape[0]+1, clusters.shape[0], 
+        N=args.layers, d_model=args.emb_size, d_ff=1024, h=args.heads
+        ).to(device)
     model.load_state_dict(torch.load(f'models/QuantizedTF/{args.name}/{args.epoch}.pth'))
     model.to(device)
     model.eval()
@@ -138,8 +140,10 @@ def get_predictions(args):
 
             # Get all predictions in parallel. Faster!
             scenes = tqdm(scenes)
-            pred_list = Parallel(n_jobs=1)(delayed(predict_multimodal_scene)(model, clusters, paths, args)
-                                           for (_, _, paths), scene_goal in zip(scenes, scene_goals))
+            pred_list = Parallel(n_jobs=1)(
+                delayed(predict_multimodal_scene)(model, clusters, paths, args)
+                for (_, _, paths), scene_goal in zip(scenes, scene_goals)
+                )
             
             # Write all predictions
             write_predictions(pred_list, scenes, model_name, dataset_name, args)
@@ -177,14 +181,14 @@ def main():
     args.output = ['traj_trans']
     args.path = args.dataset_folder + args.dataset_name + '/test_pred/'
 
-    ## Writes to Test_pred
-    ## Does NOT overwrite existing predictions if they already exist ###
+    # Writes to Test_pred
+    # Does NOT overwrite existing predictions if they already exist ###
     get_predictions(args)
     if args.write_only: # For submission to AICrowd.
         print("Predictions written in test_pred folder")
         exit()
 
-    ## Evaluate using TrajNet++ evaluator
+    # Evaluate using TrajNet++ evaluator
     trajnet_evaluate(args)
 
 
