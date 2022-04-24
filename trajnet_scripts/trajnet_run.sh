@@ -1,5 +1,3 @@
-cd ..
-
 MODES=3
 
 # Run K-means clustering
